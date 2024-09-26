@@ -9,13 +9,9 @@ from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
-
 class FileStorage:
-    """Represent an abstracted storage engine.
-    Attributes:
-        __file_path (str): The name of the file to save objects to.
-        __objects (dict): A dictionary of instantiated objects.
-    """
+    """Represent an abstracted storage engine."""
+
     __file_path = "file.json"
     __objects = {}
 
@@ -26,12 +22,11 @@ class FileStorage:
     def new(self, obj):
         """Set in __objects obj with key <obj_class_name>.id"""
         ocname = obj.__class__.__name__
-        FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
+        FileStorage.__objects[f"{ocname}.{obj.id}"] = obj
 
     def save(self):
         """Serialize __objects to the JSON file __file_path."""
-        odict = FileStorage.__objects
-        objdict = {obj: odict[obj].to_dict() for obj in odict.keys()}
+        objdict = {obj: FileStorage.__objects[obj].to_dict() for obj in FileStorage.__objects}
         with open(FileStorage.__file_path, "w") as f:
             json.dump(objdict, f)
 
@@ -46,3 +41,4 @@ class FileStorage:
                     self.new(eval(cls_name)(**o))
         except FileNotFoundError:
             return
+
